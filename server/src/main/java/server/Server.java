@@ -15,7 +15,7 @@ public class Server {
     private static ServerSocket server;
     private static Socket socket;
 
-    private static final int PORT = 8197;
+    private static final int PORT = 8199;
     private List<ClientHandler> client;
     private AuthService authService;
 
