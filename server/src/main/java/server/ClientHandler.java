@@ -66,6 +66,8 @@ public class ClientHandler {
                             if (server.getAuthService().getNicknameYesNo(user)) {
 
                                 server.userMsg(nickname, user, token[1]);
+                                server.emailToYourSelf(this.nickname, token[1]);
+
 
                             } else {
                                 out.writeUTF("/there is no such user");

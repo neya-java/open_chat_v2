@@ -69,6 +69,15 @@ public class Server {
         }
     }
 
+    public void emailToYourSelf(String nickname, String msg){
+        String message = String.format("%s : %s", nickname, msg);
+        for (ClientHandler c : client) {
+            if (nickname.equals(c.getNickname())) {
+                c.sendMsg(message);
+            }
+        }
+    }
+
     public void subscribe(ClientHandler clientHandler){
         client.add(clientHandler);
     }
