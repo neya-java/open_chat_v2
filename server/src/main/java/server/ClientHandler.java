@@ -12,6 +12,7 @@ public class ClientHandler {
     private DataOutputStream out;
 
     private String nickname;
+    private String login;
 
     public ClientHandler(Server server, Socket socket) {
         try {
@@ -30,24 +31,44 @@ public class ClientHandler {
 
                         if (str.equals("/end")) { // проверяем, что не end
                             out.writeUTF("/end");
-                            break;
+                            throw new RuntimeException("Клиент решил отключиться");
                         }
+                        // Аутентификация
                         if (str.startsWith("/auth")) { // проверяем, что авторизационное
-                            String[] token = str.split("\\s+");
+                            String[] token = str.split("\\s+",3);
+                            if(token.length < 3 ) {
+                                continue;
+                            }
                             String newNick = server
                                     .getAuthService()
                                     .getNicknameByLoginAndPassword(token[1], token[2]);
                             if (newNick != null) {
-                                nickname = newNick;
-                                sendMsg("/auth_ok " + nickname);
-                                server.subscribe(this);
-                                System.out.println("Client authenticated. nick:" + nickname +
-                                        " Address: " + socket.getRemoteSocketAddress());
-                                break;
+                                login = token[1];
+                                if (!server.isLoginAuthenticated(login)) {
+                                    nickname = newNick;
+                                    sendMsg("/auth_ok " + nickname);
+                                    server.subscribe(this);
+                                    System.out.println("Client authenticated. nick:" + nickname +
+                                            " Address: " + socket.getRemoteSocketAddress());
+                                    break;
+                                } else {
+                                    sendMsg("You have already logged in with this username.");
+                                }
                             } else {
-                                sendMsg("error login password");
+                                sendMsg("error login / password");
                             }
-
+                        }
+                        if (str.startsWith("/reg")) {
+                            String[] token = str.split("\\s+", 4);
+                            if(token.length < 4 ) {
+                                continue;
+                            }
+                            boolean b = server.getAuthService().registration(token[1],token[2],token[3]);
+                            if(b){
+                                sendMsg("/reg_ok");
+                            } else {
+                                sendMsg("/reg_no");
+                            }
                         }
                     }
 
@@ -60,25 +81,18 @@ public class ClientHandler {
                                 out.writeUTF("/end");
                                 break;
                             }
-
-                            String[] token = str.split("\\s+", 2);
-                            String user = token[0].substring(1);
-                            if (server.getAuthService().getNicknameYesNo(user)) {
-
-                                server.userMsg(nickname, user, token[1]);
-                                server.emailToYourSelf(this.nickname, token[1]);
-
-
-                            } else {
-                                out.writeUTF("/there is no such user");
+                            if (str.startsWith("/w")) {
+                                String[] token = str.split("\\s+", 3);
+                                server.privateMsg(this, token[1], token[2]);
                             }
-
 
                         } else {
                             server.broadcastMsg(this, str); // поэтому отрабатывает broadcastMsg
                         }
 
                     }
+                } catch (RuntimeException e){
+                    System.out.println(e.getMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
@@ -107,5 +121,9 @@ public class ClientHandler {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public String getLogin() {
+        return login;
     }
 }

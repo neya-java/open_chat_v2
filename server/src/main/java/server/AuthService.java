@@ -11,4 +11,9 @@ public interface AuthService {
 
     boolean getNicknameYesNo(String name);
 
+    /**
+     * Попытка регистрации новой учетной записи
+     * */
+    boolean registration(String login, String password, String nickname);
+
 }
