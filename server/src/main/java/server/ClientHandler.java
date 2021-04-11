@@ -96,12 +96,12 @@ public class ClientHandler {
                     }
                 // SocketTimeoutException после 120 секунд молчания будет закрыт сокет
                 }catch(SocketTimeoutException e) {
-                    try {
-                        //socket.close();
+//                    try {
+//                        socket.close();
                         this.sendMsg("/end");
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
-                    }
+//                    } catch (IOException ioException) {
+//                        ioException.printStackTrace();
+//                    }
                 } catch (RuntimeException e){
                     System.out.println(e.getMessage());
                 } catch (IOException e) {
