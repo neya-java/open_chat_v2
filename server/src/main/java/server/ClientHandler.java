@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class ClientHandler {
     private Server server;
@@ -25,6 +26,8 @@ public class ClientHandler {
 
             new Thread(() -> {
                 try {
+                    //установка таймаута время молчания после которого выскочит исключение SocketTimeoutException
+                    socket.setSoTimeout(3000);
                     //цикл authentication
                     while (true) {
                         String str = in.readUTF(); // получили сообщение
@@ -35,8 +38,8 @@ public class ClientHandler {
                         }
                         // Аутентификация
                         if (str.startsWith("/auth")) { // проверяем, что авторизационное
-                            String[] token = str.split("\\s+",3);
-                            if(token.length < 3 ) {
+                            String[] token = str.split("\\s+", 3);
+                            if (token.length < 3) {
                                 continue;
                             }
                             String newNick = server
@@ -60,11 +63,11 @@ public class ClientHandler {
                         }
                         if (str.startsWith("/reg")) {
                             String[] token = str.split("\\s+", 4);
-                            if(token.length < 4 ) {
+                            if (token.length < 4) {
                                 continue;
                             }
-                            boolean b = server.getAuthService().registration(token[1],token[2],token[3]);
-                            if(b){
+                            boolean b = server.getAuthService().registration(token[1], token[2], token[3]);
+                            if (b) {
                                 sendMsg("/reg_ok");
                             } else {
                                 sendMsg("/reg_no");
@@ -90,6 +93,14 @@ public class ClientHandler {
                             server.broadcastMsg(this, str); // поэтому отрабатывает broadcastMsg
                         }
 
+                    }
+                // SocketTimeoutException после 120 секунд молчания будет закрыт сокет
+                }catch(SocketTimeoutException e) {
+                    try {
+                        //socket.close();
+                        this.sendMsg("/end");
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
                     }
                 } catch (RuntimeException e){
                     System.out.println(e.getMessage());
