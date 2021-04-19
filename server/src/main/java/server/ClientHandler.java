@@ -27,7 +27,7 @@ public class ClientHandler {
             new Thread(() -> {
                 try {
                     //установка таймаута время молчания после которого выскочит исключение SocketTimeoutException
-                    socket.setSoTimeout(3000);
+                    socket.setSoTimeout(150000);
                     //цикл authentication
                     while (true) {
                         String str = in.readUTF(); // получили сообщение
@@ -87,6 +87,18 @@ public class ClientHandler {
                             if (str.startsWith("/w")) {
                                 String[] token = str.split("\\s+", 3);
                                 server.privateMsg(this, token[1], token[2]);
+                            }
+                            if (str.startsWith("/chnick")) {
+                                String[] token = str.split("\\s+", 2);
+                                if (token.length < 2) {
+                                    continue;
+                                }
+                                if (token[1].contains(" ")) {
+                                    sendMsg("Ник не может содержать пробел");
+                                    continue;
+                                }
+                                // реализация смены ника
+                                //if (server.getAuthService().changeNick)
                             }
 
                         } else {

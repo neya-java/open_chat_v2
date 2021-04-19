@@ -43,18 +43,18 @@ public class SimpleAuthService implements AuthService{
     }
 
 
-    @Override
-    public boolean getNicknameYesNo(String user){
-        for (UserData u : users) {
-            if(user.equals(u.login)){
-                return true;
-            } else
-            {
-
-            }
-        }
-        return false;
-    }
+//    @Override
+//    public boolean getNicknameYesNo(String user){
+//        for (UserData u : users) {
+//            if(user.equals(u.login)){
+//                return true;
+//            } else
+//            {
+//
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public boolean registration(String login, String password, String nickname) {

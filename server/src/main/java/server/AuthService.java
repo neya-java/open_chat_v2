@@ -9,7 +9,7 @@ public interface AuthService {
      * */
     String getNicknameByLoginAndPassword(String login, String password);
 
-    boolean getNicknameYesNo(String name);
+//    boolean getNicknameYesNo(String name);
 
     /**
      * Попытка регистрации новой учетной записи
